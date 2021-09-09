@@ -50,6 +50,10 @@
       set_fact:
         vscode_user_password: "{{ tower_admin_password }}"
 
+    - name: Set Private Automation Hub Password to tower_admin_password
+      set_fact:
+        privateautomationhub_admin_password: "{{ tower_admin_password }}"
+
     - name: Set SSH password for student user
       set_fact:
         student_password: "{{ tower_admin_password }}"
