@@ -8,7 +8,7 @@
         msg: "Post-Software tasks Started"
 
 - name: PostSoftware flight-check
-  hosts: bastions
+  hosts: bastion
   gather_facts: false
   become: false
   tags:

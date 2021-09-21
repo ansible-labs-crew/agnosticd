@@ -41,6 +41,9 @@ install_ipa_client: false
 install_student_user: true
 #software_to_deploy: tower  # replaced by role deploy_automationcontroller in software
 
+# This will install Private Automation Hub
+install_privateautomationhub: true
+
 ## Set Tower manifest and installer tarball location and creds if not specified in agnosticv vars file
 #tower_license_manifest:
 #  type: url
@@ -96,14 +99,9 @@ node_instance_count: 3
 node_instance_type: "t2.large"
 node_instance_image: "RHEL84GOLD"
 
-worker_instance_count: 0
-worker_instance_type: "t2.large"
-worker_instance_image: "RHEL84GOLD"
-
-support_instance_count: 0
-support_instance_type: "t2.large"
-support_instance_image: "RHEL84GOLD"
-isosupport_instance_count: 0
+pah_instance_count: 1
+pah_instance_type: "t2.large"
+pah_instance_image: "RHEL84GOLD"
 
 subnets:
 - name: PublicSubnet
@@ -294,7 +292,9 @@ instances:
   count: 1
   unique: true
   public_dns: true
-  dns_loadbalancer: true
+  add_public_dns:
+  - vscode
+  dns_loadbalancer: false
   security_groups:
   - BastionSG
   image: "{{ bastion_instance_image }}"
@@ -360,101 +360,24 @@ instances:
   key_name: "{{key_name}}"
   subnet: PublicSubnet
 
-- name: "support"
-  count: "{{support_instance_count}}"
-  public_dns: false
+- name: "pah"
+  count: "1"
+  unique: true
+  public_dns: true
   security_groups:
   - TowerSG
   - HostSG
-  image: "{{ support_instance_image }}"
+  image: "{{ pah_instance_image }}"
   flavor:
-    "ec2": "{{support_instance_type}}"
+    "ec2": "{{pah_instance_type}}"
   tags:
   - key: "AnsibleGroup"
-    value: "support"
+    value: "automationhub"
   - key: "ostype"
     value: "rhel"
   key_name: "{{key_name}}"
   subnet: PublicSubnet
 
-# isolated support hosts
-- name: "isosupport"  # name must be strictly alphanumeric!
-  count: "{{isosupport_instance_count}}"
-  public_dns: false
-  security_groups:
-  - TowerSG
-  - HostSG
-  image: "{{ support_instance_image }}"
-  flavor:
-    "ec2": "{{support_instance_type}}"
-  tags:
-  - key: "AnsibleGroup"
-    value: "support"
-  - key: "ostype"
-    value: "rhel"
-  key_name: "{{key_name}}"
-  subnet: PublicSubnet  #PrivateSubnet
-
-
-######### Worker instances #########
-instances_worker:
-- name: "worker"
-  count: "{{worker_instance_count}}"
-  security_groups:
-  - HostSG
-  - TowerSG
-  public_dns: false
-  dns_loadbalancer: false
-  image: "{{ worker_instance_image }}"
-  flavor:
-    "ec2": "{{worker_instance_type}}"
-  tags:
-  - key: "AnsibleGroup"
-    value: "workers"
-  - key: "ostype"
-    value: "linux"
-  subnet: PublicSubnet  #PrivateSubnet
-#########
-
-  # - name: "worker{{target_regions[1].name}}"
-  #   count: "{{worker_instance_count}}"
-  #   security_groups:
-  #     - HostSG
-  #     - TowerSG
-  #   public_dns: false
-  #   dns_loadbalancer: false
-  #   image: "{{ worker_instance_image }}"
-  #   flavor:
-  #     "ec2": "{{worker_instance_type}}"
-  #   tags:
-  #     - key: "AnsibleGroup"
-  #       value: "workers"
-  #     - key: "ostype"
-  #       value: "linux"
-  #     - key: Worker_region
-  #       value: "{{ target_regions[1].name }}"
-  #   subnet: PublicSubnet
-  #   #########
-
-  # - name: "worker{{target_regions[2].name}}"
-  #   count: "{{worker_instance_count}}"
-  #   security_groups:
-  #     - HostSG
-  #     - TowerSG
-  #   public_dns: false
-  #   dns_loadbalancer: false
-  #   image: "{{ worker_instance_image }}"
-  #   flavor:
-  #     "ec2": "{{worker_instance_type}}"
-  #   tags:
-  #     - key: "AnsibleGroup"
-  #       value: "workers"
-  #     - key: "ostype"
-  #       value: "linux"
-  #     - key: Worker_region
-  #       value: "{{ target_regions[2].name }}"
-  #   subnet: PublicSubnet
-    #######*************#############
 
 ###### VARIABLES YOU SHOULD ***NOT*** CONFIGURE FOR YOUR DEPLOYEMNT
 ###### You can, but you usually wouldn't need to.

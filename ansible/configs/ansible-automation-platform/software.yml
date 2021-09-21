@@ -18,17 +18,22 @@
       run_once: true
       when: dump_vars|default(false)|bool
 
+- name: Install code-server
+  hosts: bastions[0]
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Install code-server (config role)
+      include_role:
+        name: vscode-server_cfg
+
 - name: Install Ansible automation controller
   hosts: bastions[0]
   gather_facts: false
   become: true
 
   tasks:
-
-    - name: Install code-server (config role)
-      include_role:
-        name: vscode-server_cfg
-
     - name: Download Manifest for Controller
       get_url:
         url: "{{ controller_manifest.url }}"
@@ -36,20 +41,9 @@
         username: "{{ controller_manifest.username }}"
         password: "{{ controller_manifest.password }}"
 
-    - name: Install Ansible automation controller (config role)
+    - name: Install Ansible automation controller on autoctl nodes(config role)
       include_role:
         name: deploy_automationcontroller_cfg
-
-- name: Install Ansible Private Automation Hub
-  hosts: support[0]
-  gather_facts: false
-  become: true
-
-  tasks:
-
-    - name: Install Ansible Private Automation Hub (config role)
-      include_role:
-        name: deploy_privateautomationhub_cfg
 
 - name: Install license and LE certs on autoctl nodes
   hosts: automationcontroller
@@ -57,7 +51,6 @@
   become: true
 
   tasks:
-
     - name: License autoctl nodes (config role)
       include_role:
         name: tower-license-injector_cfg
@@ -66,6 +59,17 @@
     - name: call issue_cert role (config role)
       include_role:
         name: automation_controller_issue_cert_cfg
+
+- name: Install Private Automation Hub on dedicated node
+  hosts: automationhub[0]
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Install Ansible Private Automation Hub (config role)
+      include_role:
+        name: deploy_privateautomationhub_cfg
+      when: install_privateautomationhub | d(false) | bool
 
 - name: Software flight-check
   hosts: localhost
