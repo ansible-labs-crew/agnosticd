@@ -1,0 +1,29 @@
+---
+## Preload execution environments
+
+- name: Login to redhat registry
+  containers.podman.podman_login:
+    username: '{{ registry_username }}'
+    password: '{{ registry_password }}'
+    registry: registry.redhat.io
+  become_user: "awx"
+
+- name: Mod containers.conf to utilize max of 10 parallel threads
+  become_user: "awx"
+  lineinfile:
+    path: /var/lib/awx/.config/containers/containers.conf
+    line: 'image_parallel_copies=10'
+    insertafter: EOF
+
+- name: Pull supported images
+  become_user: "awx"
+  containers.podman.podman_image:
+    name: "{{ item }}"
+  loop:
+    - "registry.redhat.io/ansible-automation-platform-20-early-access/ee-supported-rhel8:2.0.0"
+    - "registry.redhat.io/ansible-automation-platform-20-early-access/ee-29-rhel8:2.0.0"
+    - "registry.redhat.io/ansible-automation-platform-20-early-access/ee-minimal-rhel8:2.0.0"
+  register: podman_pull_supported
+  until: podman_pull_supported is not failed
+  retries: 5
+  delay: 15
