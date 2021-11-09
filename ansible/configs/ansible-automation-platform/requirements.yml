@@ -8,3 +8,5 @@ roles:
 collections:
 - name: awx.awx
   version: '19.2.2'
+- name: containers.podman
+  version: '1.8.2'
