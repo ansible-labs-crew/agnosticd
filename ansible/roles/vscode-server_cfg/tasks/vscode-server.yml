@@ -2,7 +2,7 @@
 
 - name: Download vscode-server package
   get_url:
-    url: https://github.com/cdr/code-server/releases/download/v3.11.1/code-server-3.11.1-amd64.rpm
+    url: https://github.com/cdr/code-server/releases/download/v3.12.0/code-server-3.12.0-amd64.rpm
     dest: /tmp/code-server.rpm
 
 - name: Install vscode-server
@@ -31,7 +31,7 @@
     owner: "{{ vscode_user_name }}"
     group: users
 
-- name: Download default vscode extensions from gpte-public 
+- name: Download default vscode extensions from gpte-public
   get_url:
     url: "https://gpte-public.s3.amazonaws.com/vscode-plugins/{{ __default_extension }}"
     dest: /home/{{ vscode_user_name }}/.local/share/code-server/extensions/
@@ -54,14 +54,14 @@
 
 - name: List vscode extensions
   shell: >-
-    ls /home/{{ vscode_user_name }}/.local/share/code-server/extensions/ 
+    ls /home/{{ vscode_user_name }}/.local/share/code-server/extensions/
     | grep ".vsix"
   register: vscode_extensions
 
 - name: install vscode extensions
   become_user: "{{ vscode_user_name }}"
   command: >-
-    /bin/code-server --install-extension 
+    /bin/code-server --install-extension
     /home/{{ vscode_user_name }}/.local/share/code-server/extensions/{{ __vscode_extension }}
   loop: "{{ vscode_extensions.stdout_lines }}"
   loop_control:
@@ -74,7 +74,7 @@
     owner: "{{ vscode_user_name }}"
     group: users
     mode: '0744'
-    
+
 - name: Enable and start vscode-server daemon
   systemd:
     enabled: true

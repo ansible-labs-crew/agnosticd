@@ -1,25 +1,20 @@
 ---
-- name: Install nginx on bastion/control node RHEL 8
-  block:
-    # would be better to use GPTE Satellite
-    - name: Enable EPEL
-      dnf:
-        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
-        state: present
-        disable_gpg_check: true
+- name: install python3-virtualenv
+  ansible.builtin.yum:
+    name: python3-virtualenv
+    state: present
 
-    - name: install nginx/certbot
-      yum:
-        name:
-      #    - nginx
-          - certbot
-          - python3-certbot-nginx
-        state: present
-  when: ansible_distribution == "RedHat" and ansible_distribution_major_version == '8'
+- name: install certbot and nginx plugin
+  ansible.builtin.pip:
+    name:
+      - certbot
+      - certbot-nginx
+    virtualenv: /opt/certbot
+    state: present
 
 - name: Generate certbot
   command: >-
-    certbot certonly --nginx
+    /opt/certbot/bin/certbot certonly --nginx
     -m {{ email | regex_replace('example.com$','opentlc.com') }}
     --agree-tos
     -d {{ pah_server_hostname  }} -n

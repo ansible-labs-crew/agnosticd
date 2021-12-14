@@ -181,27 +181,14 @@ security_groups:
     protocol: tcp
     cidr: "0.0.0.0/0"
     rule_type: Ingress
-  - name: RabbitMqCLi
-    description: "RabbitMq Cli"
-    from_port: 25672
-    to_port: 25672
+  - name: Receptor
+    description: "Receptor"
+    from_port: 27199
+    to_port: 27199
     protocol: tcp
     cidr: "0.0.0.0/0"
     rule_type: Ingress
-  - name: RabbitMqAPi
-    description: "RabbitMq Api"
-    from_port: 15672
-    to_port: 15672
-    protocol: tcp
-    cidr: "0.0.0.0/0"
-    rule_type: Ingress
-  - name: RabbitMqCliTools
-    description: "RabbitMq CLi tools"
-    from_port: 35672
-    to_port: 35672
-    protocol: tcp
-    cidr: "0.0.0.0/0"
-    rule_type: Ingress
+
   - name: BasTowerTcp
     description: "ALL from bastion tcp"
     from_port: 0

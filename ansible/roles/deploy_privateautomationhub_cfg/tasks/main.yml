@@ -1,9 +1,4 @@
 ---
-- name: Ensure yum/dnf pre-requisites in place
-  package:
-    name: "{{ deploy_automationcontroller_dnf_packages }}"
-    state: present
-
 - name: Download Ansible controller installer tar.gz
   get_url:
     url: "{{ automationcontroller_installer.url }}"

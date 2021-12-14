@@ -11,20 +11,6 @@ deploy_privateautomationhub_admin_password: >-
 
 # packages, libraries, installer vars
 
-deploy_automationcontroller_pip_packages:
-  - pip
-  - setuptools
-  - wheel
-  - ansible
-  - requests
-  - ansible-tower-cli
-
-deploy_automationcontroller_dnf_packages:
-  - python3.8
-  - podman
-  - crun
-  - ansible
-
 deploy_automationcontroller_dnf_gpgcheck: 0
 
 ...
